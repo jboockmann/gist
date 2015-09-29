@@ -117,7 +117,7 @@
       var l = gists.length;
       for (var i = 0; i < l; i++) {
         var g = gists[i];
-        if (prettyDate(g.updated_at) == undefined) {
+        if (prettyDate(g.updated_at) == "undefined") {
           date = prettyDate(g.created_at);
         } else {
           date = prettyDate(g.updated_at);
