@@ -124,29 +124,37 @@
       projectsCount.innerHTML = l + ' public gists';
       projectsInfo.innerHTML = 'Last Update';
     };
-    // Relative times
-    function prettyDate(date) {
-        var seconds, formats, i = 0, f;
-        date = new Date(date);
-        seconds = (new Date() - date) / 1000;
-        formats = [
-            [60, 'seconds', 1],
-            [120, '1 minute ago'],
-            [3600, 'minutes', 60],
-            [7200, '1 hour ago'],
-            [86400, 'hours', 3600],
-            [172800, 'Yesterday'],
-            [604800, 'days', 86400],
-            [1209600, '1 week ago'],
-            [2678400, 'weeks', 604800]
-        ];
-
-        while (f = formats[i++]) {
-            if (seconds < f[0]) {
-                return f[2] ? Math.floor(seconds / f[2]) + ' ' + f[1] + ' ago' :  f[1];
-            }
-        }
-        return 'A while ago';
+  // Relative times
+  function prettyDate(date) {
+    if (!date_str) {
+      return;
     }
+    date_str = $.trim(date_str);
+    date_str = date_str.replace(/\.\d\d\d+/, ""); // remove the milliseconds
+    date_str = date_str.replace(/-/, "/").replace(/-/, "/"); //substitute - with /
+    date_str = date_str.replace(/T/, " ").replace(/Z/, " UTC"); //remove T and substitute Z with UTC
+    date_str = date_str.replace(/([\+\-]\d\d)\:?(\d\d)/, " $1$2"); // +08:00 -> +0800
+    var parsed_date = new Date(date_str);
+    var relative_to = (arguments.length > 1) ? arguments[1] : new Date(); //defines relative to what ..default is now
+    var delta = parseInt((relative_to.getTime() - parsed_date) / 1000);
+    delta = (delta < 2) ? 2 : delta;
+    var r = '';
+    if (delta < 60) {
+      r = delta + ' seconds ago';
+    } else if (delta < 120) {
+      r = 'a minute ago';
+    } else if (delta < (45 * 60)) {
+      r = (parseInt(delta / 60, 10)).toString() + ' minutes ago';
+    } else if (delta < (2 * 60 * 60)) {
+      r = 'an hour ago';
+    } else if (delta < (24 * 60 * 60)) {
+      r = '' + (parseInt(delta / 3600, 10)).toString() + ' hours ago';
+    } else if (delta < (48 * 60 * 60)) {
+      r = 'a day ago';
+    } else {
+      r = (parseInt(delta / 86400, 10)).toString() + ' days ago';
+    }
+    return 'about ' + r;
+  }
 </script>
 <script src="https://api.github.com/users/heiswayi/gists?callback=load&per_page=100"></script>
