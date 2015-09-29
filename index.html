@@ -117,12 +117,7 @@
       var l = gists.length;
       for (var i = 0; i < l; i++) {
         var g = gists[i];
-        if (g.updated_at == g.created_at) {
-          date = prettyDate(g.created_at);
-        } else {
-          date = prettyDate(g.updated_at);
-        }
-        html += '<li>' + '<a href="' + g.html_url + '">' + '<span class="info"><b class="time">' + date + '</b></span>' + '<b>' + Object.keys(g.files)
+        html += '<li>' + '<a href="' + g.html_url + '">' + '<span class="info"><b class="time">' + prettyDate(g.updated_at) + '</b></span>' + '<b>' + Object.keys(g.files)
           .join("<span class='middot'> &#10753; </span>") + '</b> ' + '<span class="desc">' + g.description + '</span>' + '</a>';
       }
       gistsList.innerHTML = html;
