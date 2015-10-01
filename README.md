@@ -1,8 +1,18 @@
-# My GitHub Gists in One Place
+# my-gists
 
-Showing all my public Gists on GitHub in one place.
+Displaying all of my public GitHub gists in one place
 
-**Live Link:** http://heiswayi.github.io/my-gists
+**URL:** http://heiswayi.github.io/my-gists
+
+# Screenshots
+
+### Old Version
+
+![Old Version](old_version/screenshot.png)
+
+### New Version
+
+![New Version](screenshot.png)
 
 # License
 
