@@ -16,13 +16,16 @@
     font-size: 13px;
     margin: 0;
     padding: 0;
+    background-color: #666;
+    color: #fff;
   }
 
   h1 a {
     display: block;
     line-height: 20px;
     padding: 6px 20px;
-    border-bottom: 1px solid #ddd;
+    /*border-bottom: 1px solid #ddd;*/
+    color: #fff;
   }
 
   #projects-count {
@@ -81,6 +84,7 @@
     display: inline-block;
     line-height: 1.3em;
     margin-left: .5em;
+    font-style: italic;
   }
 
   #projects-info,
@@ -117,7 +121,7 @@
       var l = gists.length;
       for (var i = 0; i < l; i++) {
         var g = gists[i];
-        html += '<li>' + '<a href="' + g.html_url + '">' + '<span class="info"><b class="time">' + prettyDate(g.updated_at) + '</b></span>' + '<b>' + Object.keys(g.files)
+        html += '<li>' + '<a href="' + g.html_url + '">' + '<span class="info"><b class="time" title="' + realDate(g.updated_at) + '">' + prettyDate(g.updated_at) + '</b></span>' + '<b>' + Object.keys(g.files)
           .join("<span class='middot'> &#10753; </span>") + '</b> ' + '<span class="desc">' + g.description + '</span>' + '</a>';
       }
       gistsList.innerHTML = html;
@@ -126,14 +130,45 @@
     };
   // Relative times
   function prettyDate(time) {
-      var date = new Date((time || "").replace(/-/g, "/").replace(/[TZ]/g, " ")),
-          diff = (((new Date()).getTime() - date.getTime()) / 1000),
-          day_diff = Math.floor(diff / 86400);
+    var date = new Date((time || "").replace(/-/g, "/").replace(/[TZ]/g, " "));
+    var secs = (((new Date()).getTime() - date.getTime()) / 1000);
+    Math.floor(secs);
+    var minutes = secs / 60;
+    secs = Math.floor(secs % 60);
+    if (minutes < 1) {
+        return secs + (secs > 1 ? ' seconds ago' : ' second ago');
+    }
+    var hours = minutes / 60;
+    minutes = Math.floor(minutes % 60);
+    if (hours < 1) {
+        return minutes + (minutes > 1 ? ' minutes ago' : ' minute ago');
+    }
+    var days = hours / 24;
+    hours = Math.floor(hours % 24);
+    if (days < 1) {
+        return hours + (hours > 1 ? ' hours ago' : ' hour ago');
+    }
+    var weeks = days / 7;
+    days = Math.floor(days % 7);
+    if (weeks < 1) {
+        return days + (days > 1 ? ' days ago' : ' day ago');
+    }
+    var months = weeks / 4.35;
+    weeks = Math.floor(weeks % 4.35);
+    if (months < 1) {
+        return weeks + (weeks > 1 ? ' weeks ago' : ' week ago');
+    }
+    var years = months / 12;
+    months = Math.floor(months % 12);
+    if (years < 1) {
+        return months + (months > 1 ? ' months ago' : ' month ago');
+    }
+    years = Math.floor(years);
+    return years + (years > 1 ? ' years ago' : ' years ago');
+  }
 
-      if (isNaN(day_diff) || day_diff < 0 || day_diff >= 31) return;
-
-      return day_diff == 0 && (
-      diff < 60 && "just now" || diff < 120 && "1 minute ago" || diff < 3600 && Math.floor(diff / 60) + " minutes ago" || diff < 7200 && "1 hour ago" || diff < 86400 && Math.floor(diff / 3600) + " hours ago") || day_diff == 1 && "Yesterday" || day_diff < 7 && day_diff + " days ago" || day_diff < 31 && Math.ceil(day_diff / 7) + " weeks ago";
+  function realDate(time) {
+    return new Date((time || "").replace(/-/g, "/").replace(/[TZ]/g, " "));
   }
 </script>
 <script src="https://api.github.com/users/heiswayi/gists?callback=load&per_page=100"></script>
