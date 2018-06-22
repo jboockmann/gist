@@ -1,174 +1,151 @@
 <!DOCTYPE html>
-<meta charset="UTF-8">
-<title>heiswayi nrird | github gists</title>
-<meta name="viewport" content="width=device-width; initial-scale=1">
-<style>
-  body {
-    color: #666;
-    background-color: #fff;
-    font-family: helvetica, arial, sans-serif;
-    font-size: 13px;
-    margin: 0;
-    padding: 0;
-  }
+<html>
 
-  h1 {
-    font-size: 13px;
-    margin: 0;
-    padding: 0;
-    background-color: #666;
-    color: #fff;
-  }
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <title>Heiswayi Nrird's GitHub Gists</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.3.2/dist/semantic.min.css">
 
-  h1 a {
-    display: block;
-    line-height: 20px;
-    padding: 6px 20px;
-    /*border-bottom: 1px solid #ddd;*/
-    color: #fff;
-  }
+    <style>
+        body {
+            background: repeating-linear-gradient(135deg, #dfdfdf 0, #dfdfdf 1%, #fff 0, #fff 50%) 0/20px 20px;
+        }
+        .ui.container {
+            margin-top: 3em;
+            margin-bottom: 3em;
+        }
 
-  #projects-count {
-    font-weight: normal;
-    color: #ccc;
-    display: inline-block;
-    line-height: 1.3em;
-    margin-left: .5em;
-  }
+        td.datetime {
+            min-width: 120px;
+            color: rgba(0, 0, 0, .5);
+        }
 
-  a {
-    color: #666;
-    background-color: transparent;
-    text-decoration: none;
-    -webkit-transition: all .2s;
-    -moz-transition: all .2s;
-    -ms-transition: all .2s;
-    -o-transition: all .2s;
-    transition: all .2s;
-  }
+        span.middot {
+            color: rgba(0, 0, 0, .5);
+        }
 
-  a:hover {
-    color: #fff;
-    background-color: #666;
-  }
+        div.loading {
+            padding: 20px;
+        }
+    </style>
 
-  #gists-list {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
+</head>
 
-  #gists-list li {
-    display: inline;
-  }
+<body>
 
-  #gists-list li a {
-    position: relative;
-    display: block;
-    line-height: 20px;
-    padding: 6px 20px;
-    overflow: hidden;
-  }
+    <div class="ui container">
+        <table class="ui selectable table" id="myTable">
+            <thead>
+                <tr class="heading">
+                    <th colspan="2" class="author">
+                        <div class="ui horizontal list">
+                            <div class="item">
+                                <img class="ui avatar image" src="https://avatars0.githubusercontent.com/u/13794983?v=4">
+                                <div class="content">
+                                    <div class="header">Heiswayi Nrird</div>
+                                    <a href="https://heiswayi.nrird.com">https://heiswayi.nrird.com</a>
+                                </div>
+                            </div>
+                        </div>
+                    </th>
+                    <th class="datetime">
+                        <a href="https://gist.github.com/heiswayi" class="compact ui labeled icon blue button" title="Go to GitHub Gist">
+                            <i class="github alternate icon"></i>
+                            Gist
+                        </a>
+                    </th>
+                </tr>
+                <tr>
+                    <th>File(s)</th>
+                    <th>Description</th>
+                    <th class="datetime">Last update</th>
+                </tr>
+            </thead>
+            <tbody id="myTableBody"></tbody>
+        </table>
+    </div>
 
-  #gists-list li:nth-child(odd) a {
-    background-color: #fafafa;
-  }
+    <script src="jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.3.2/dist/semantic.min.js"></script>
+    <script type="text/javascript">
+        jQuery.githubUser = function (username, callback) {
+            jQuery.getJSON('https://api.github.com/users/' + username + '/gists?callback=?&per_page=100', callback)
+        }
 
-  #gists-list li a:hover {
-    color: #fff;
-    background-color: #666;
-  }
+        jQuery.fn.loadGists = function (username) {
+            this.html('<div class="loading">Querying GitHub for ' + username + '\'s gists...</div>');
 
-  #gists-list li a .desc {
-    color: #ccc;
-    display: inline-block;
-    line-height: 1.3em;
-    margin-left: .5em;
-    font-style: italic;
-  }
+            var target = this;
+            $.githubUser(username, function (data) {
+                var gists = data.data; // JSON Parsing
+                sortByName(gists);
+                target.empty();
+                $(gists).each(function () {
+                    target.append('<tr>' +
+                        '<td class="item"><a href="' + (this.homepage ? this.homepage : this.html_url) +
+                        '">' + Object.keys(this.files).join(
+                            "<span class='middot'> • </span>") + '</a></td>' +
+                        '<td class="description">' + this.description + '</td>' +
+                        '<td class="datetime"><span title="' + realDate(this.updated_at) + '">' +
+                        prettyDate(this.updated_at) + '</span></td>' +
+                        '</tr>');
+                });
+            });
 
-  #projects-info,
-  #gists-list li a .info {
-    float: right;
-    clear: right;
-  }
+            function sortByName(data) {
+                data.sort(function (a, b) {
+                    return a.name - b.name;
+                });
+            }
 
-  b.time {
-    font-weight: bold;
-    display: inline-block;
-  }
+            function prettyDate(time) {
+                var date = new Date((time || "").replace(/-/g, "/").replace(/[TZ]/g, " "));
+                var secs = (((new Date()).getTime() - date.getTime()) / 1000);
+                Math.floor(secs);
+                var minutes = secs / 60;
+                secs = Math.floor(secs % 60);
+                if (minutes < 1) {
+                    return secs + (secs > 1 ? ' seconds ago' : ' second ago');
+                }
+                var hours = minutes / 60;
+                minutes = Math.floor(minutes % 60);
+                if (hours < 1) {
+                    return minutes + (minutes > 1 ? ' minutes ago' : ' minute ago');
+                }
+                var days = hours / 24;
+                hours = Math.floor(hours % 24);
+                if (days < 1) {
+                    return hours + (hours > 1 ? ' hours ago' : ' hour ago');
+                }
+                var weeks = days / 7;
+                days = Math.floor(days % 7);
+                if (weeks < 1) {
+                    return days + (days > 1 ? ' days ago' : ' day ago');
+                }
+                var months = weeks / 4.35;
+                weeks = Math.floor(weeks % 4.35);
+                if (months < 1) {
+                    return weeks + (weeks > 1 ? ' weeks ago' : ' week ago');
+                }
+                var years = months / 12;
+                months = Math.floor(months % 12);
+                if (years < 1) {
+                    return months + (months > 1 ? ' months ago' : ' month ago');
+                }
+                years = Math.floor(years);
+                return years + (years > 1 ? ' years ago' : ' years ago');
+            }
 
-  .middot {
-    color: #ccc;
-    font-weight: normal;
-  }
-</style>
-<h1>
-  <a href="http://gist.github.com/heiswayi">
-    <span id="projects-info"></span>heiswayi.github.gists
-    <span id="projects-count"></span>
-  </a>
-</h1>
-<ul id="gists-list"></ul>
-<script>
-  var gistsList = document.getElementById('gists-list'),
-    projectsCount = document.getElementById('projects-count'),
-    projectsInfo = document.getElementById('projects-info'),
-    load = function(data) {
-      if (!data || !data.data || !data.data.length) return;
-      var gists = data.data,
-        html = '';
-      var l = gists.length;
-      for (var i = 0; i < l; i++) {
-        var g = gists[i];
-        html += '<li>' + '<a href="' + g.html_url + '">' + '<span class="info"><b class="time" title="' + realDate(g.updated_at) + '">' + prettyDate(g.updated_at) + '</b></span>' + '<b>' + Object.keys(g.files)
-          .join("<span class='middot'> &#10753; </span>") + '</b> ' + '<span class="desc">' + g.description + '</span>' + '</a>';
-      }
-      gistsList.innerHTML = html;
-      projectsCount.innerHTML = l + ' public gists';
-      projectsInfo.innerHTML = 'Last Update';
-    };
-  // Relative times
-  function prettyDate(time) {
-    var date = new Date((time || "").replace(/-/g, "/").replace(/[TZ]/g, " "));
-    var secs = (((new Date()).getTime() - date.getTime()) / 1000);
-    Math.floor(secs);
-    var minutes = secs / 60;
-    secs = Math.floor(secs % 60);
-    if (minutes < 1) {
-        return secs + (secs > 1 ? ' seconds ago' : ' second ago');
-    }
-    var hours = minutes / 60;
-    minutes = Math.floor(minutes % 60);
-    if (hours < 1) {
-        return minutes + (minutes > 1 ? ' minutes ago' : ' minute ago');
-    }
-    var days = hours / 24;
-    hours = Math.floor(hours % 24);
-    if (days < 1) {
-        return hours + (hours > 1 ? ' hours ago' : ' hour ago');
-    }
-    var weeks = days / 7;
-    days = Math.floor(days % 7);
-    if (weeks < 1) {
-        return days + (days > 1 ? ' days ago' : ' day ago');
-    }
-    var months = weeks / 4.35;
-    weeks = Math.floor(weeks % 4.35);
-    if (months < 1) {
-        return weeks + (weeks > 1 ? ' weeks ago' : ' week ago');
-    }
-    var years = months / 12;
-    months = Math.floor(months % 12);
-    if (years < 1) {
-        return months + (months > 1 ? ' months ago' : ' month ago');
-    }
-    years = Math.floor(years);
-    return years + (years > 1 ? ' years ago' : ' years ago');
-  }
+            function realDate(time) {
+                return new Date((time || "").replace(/-/g, "/").replace(/[TZ]/g, " "));
+            }
+        };
 
-  function realDate(time) {
-    return new Date((time || "").replace(/-/g, "/").replace(/[TZ]/g, " "));
-  }
-</script>
-<script src="https://api.github.com/users/heiswayi/gists?callback=load&per_page=100"></script>
+        $("#myTableBody").loadGists("heiswayi");
+    </script>
+
+</body>
+
+</html>
