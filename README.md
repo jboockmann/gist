@@ -1,3 +1,3 @@
-A simple dedicated webpage to display all of my GitHub gists using [GitHub API](https://developer.github.com/). Made with [jQuery](https://jquery.com/) and [Semantic UI](https://semantic-ui.com/).
+Listing site for my GitHub Gists, made using [jQuery](https://jquery.com/), [Semantic UI](https://semantic-ui.com/) and [GitHub API](https://developer.github.com/).
 
-Link: https://heiswayi.github.io/gist
+URL: https://heiswayi.github.io/gist
