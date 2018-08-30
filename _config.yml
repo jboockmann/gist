@@ -1,2 +1,2 @@
 # Other Params
-exclude:            [ "LICENSE", "README.md" ]
+exclude:            [ "LICENSE", "README.md", "_config.yml", "demo.png" ]
